@@ -2,5 +2,7 @@ module.exports = {
 	server_ip: <<SERVER_IP>>,
 	server_port: 8080,
 	server_prefix: "/chart",		//suffix?
-	db_url: "mongodb://<<DB_IP>>:27017/scalarm_db"
+	db_url: "mongodb://<<DB_IP>>:27017/scalarm_db",
+	multicast_address: "224.1.2.3",
+	multicast_port: 8000
 }

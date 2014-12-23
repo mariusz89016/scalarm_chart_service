@@ -31,6 +31,11 @@ module.exports = {
                 em_class: "bivariate-analysis",
                 image: "/chart/images/material_design/scatter_icon.png",
                 description: "Bivariate analysis - scatter plot"
+            }, {
+                name: "3D chart",
+                id: "threeDModal",
+                image: "/chart/images/material_design/3dchart_icon.png",
+                description: "3D charts - scatter plot"
             }]
 
         }

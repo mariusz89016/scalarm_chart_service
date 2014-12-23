@@ -49,13 +49,7 @@ script.
     var interaction_chart_counter = 0;
     var scripts_loaded = false;
 
-    $("#interactionModal button").bind("click", function() {
-      $("#busy_interaction").show();
-      if(!scripts_loaded) {
-        $("#interactionModal .scripts").load("#{prefix}/scripts/interaction");
-        scripts_loaded = true;
-      }
-
+    var load_chart = function(){
       var interaction_chart_div = $("<div id=\"interaction_chart_"+interaction_chart_counter+"\">")[0];
       $("#interactionModal .charts").prepend(interaction_chart_div);
 
@@ -75,6 +69,20 @@ script.
         $('html,body').animate({ scrollTop: targetOffset }, 1000);
       });
       interaction_chart_counter++;
+    }
+
+    $("#interactionModal button").bind("click", function() {
+      $("#busy_interaction").show();
+      if(!scripts_loaded) {
+        $("#interactionModal .scripts").load("#{prefix}/scripts/interaction", function(){
+          load_chart();
+          scripts_loaded = true;
+        });
+      }
+
+      else{
+        load_chart();
+      }
 
       return false;
     })

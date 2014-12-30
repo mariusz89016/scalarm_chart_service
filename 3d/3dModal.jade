@@ -49,13 +49,7 @@ script.
     var three_d_chart_counter = 0;
     var scripts_loaded = false;
 
-    $("#threeDModal button").bind("click", function() {
-      $("#busy_3d").show();
-      if(!scripts_loaded) {
-      $("#threeDModal .scripts").load("#{prefix}/scripts/3d");
-        scripts_loaded = true;
-      }
-	  
+    var load_chart = function() {
       var three_d_chart_div = $("<div id=\"three_d_chart_"+three_d_chart_counter+"\">")[0];
       $("#threeDModal .charts").prepend(three_d_chart_div);
       //TODO - if there's nothing to select -> do nothing
@@ -69,11 +63,24 @@ script.
       query_params += "&chart_id="+three_d_chart_counter;
       $(three_d_chart_div).load("#{prefix}/3d?"+query_params, function(){
         $("#busy_3d").hide();
-		
+    
         var targetOffset = $(this).offset().top;
         $('html,body').animate({ scrollTop: targetOffset }, 1000);
       });
       three_d_chart_counter++;
+    }
+
+    $("#threeDModal button").bind("click", function() {
+      $("#busy_3d").show();
+      if(!scripts_loaded) {
+        $("#threeDModal .scripts").load("#{prefix}/scripts/3d", function() {
+          load_chart();
+          scripts_loaded = true;
+        });
+      }
+      else {
+        load_chart();
+      }
 
       return false;
     })

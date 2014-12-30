@@ -36,19 +36,11 @@ script.
     if(experimentID[experimentID.length-1]=="?")
       experimentID = experimentID.slice(0,-1);
 
-    // 'Load chart' button handler
-    $('#pareto_charts_form button').bind('click', function() {
-      $('#busy_pareto').show();
-      if(!scripts_loaded){
-        $("#paretoModal .scripts").load("#{prefix}/scripts/pareto");
-        scripts_loaded = true;
-      }
-
+    var load_chart = function() {
       var pareto_chart_div = $("<div id=\"pareto_chart_"+pareto_chart_counter+"\">")[0];
       $("#paretoModal .charts").prepend(pareto_chart_div);
-
+      
       var outputParam = $("#paretoModal .outputParam option:selected").val();
-
       var query_params = "id="+experimentID;
           query_params += "&output="+outputParam;
           query_params += "&chart_id="+pareto_chart_counter;
@@ -59,6 +51,20 @@ script.
         $('html,body').animate({ scrollTop: targetOffset }, 1000);
       });
       pareto_chart_counter++;
+    }
+
+    // 'Load chart' button handler
+    $('#pareto_charts_form button').bind('click', function() {
+      $('#busy_pareto').show();
+      if(!scripts_loaded){
+        $("#paretoModal .scripts").load("#{prefix}/scripts/pareto", function() {
+          load_chart();
+          scripts_loaded = true;
+        });
+      }
+      else {
+        load_chart();
+      }
 
       return false;
     })

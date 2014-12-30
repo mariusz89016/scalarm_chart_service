@@ -55,7 +55,7 @@ var app = http.createServer(function(req, res) {
                 DataRetriever.checkIfExperimentVisibleToUser(userID, parameters["id"], function() {
                     console.log("OK! Successfully authorized.");
                     res.writeHead(200, {'Content-Type': 'text/plain'});
-                    var output = jade.renderFile("./"+path+"/"+path+"Chart.jade", parameters);
+                    var output = jade.renderFile("./visualisation_methods/"+path+"/"+path+"Chart.jade", parameters);
 					output += object.content;
                     res.write(output);
                     res.end();
@@ -233,7 +233,7 @@ function prepare_map_with_requests(parameters) {
 		var type = pathname.split("/")[2];
 		var resource = pathname.split("/")[1];
 
-		var file_path = type+"/"+type+"_chart_"+resource;
+		var file_path = "visualisation_methods/" + type+"/"+type+"_chart_"+resource;
 		file_path += resource==="style" ? ".css" : ".js";
 
 		fs.readFile(file_path, function(error, data) {

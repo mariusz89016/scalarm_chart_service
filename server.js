@@ -17,6 +17,15 @@ var panel_locals = require("./panel_locals.js");
 
 var jade = require("jade");
 
+var log4js = require("log4js");
+log4js.configure({
+  appenders: [
+    { type: 'file', filename: config.log_filename, category: ['console', 'server.js'] }
+  ],
+  replaceConsole: true
+});
+var logger = log4js.getLogger("server.js");
+
 var PORT = config.server_port,
 	EXTERNAL_IP = config.server_ip,// + ":3001",			//TODO - retrieve external IP
 	ADDRESS = EXTERNAL_IP + config.server_prefix;		//address suffix set in /etc/nginx/conf.d/default.conf

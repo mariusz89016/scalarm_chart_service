@@ -4,5 +4,6 @@ module.exports = {
 	server_prefix: "/chart",		//suffix?
 	db_url: "mongodb://<<DB_IP>>:27017/scalarm_db",
 	multicast_address: "224.1.2.3",
-	multicast_port: 8000
+	multicast_port: 8000,
+	log_filename: <<LOG_FILENAME>>
 }

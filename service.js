@@ -1,6 +1,16 @@
 var jsdom = require("jsdom").jsdom();
 var db_retriever = require("./data_retriever.js");
 
+var config = require("./config.js");
+var log4js = require("log4js");
+log4js.configure({
+  appenders: [
+    { type: 'file', filename: config.log_filename, category: ['console', 'service.js'] }
+  ],
+  replaceConsole: true
+});
+var logger = log4js.getLogger("service.js");
+
 module.exports = function() {
     var map = {};
     map["/interaction"] = function(parameters, success, error){

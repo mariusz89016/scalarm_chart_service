@@ -2,3 +2,4 @@ node_modules/
 decoder_configuration.js
 npm-debug.log
 config.js
+output.log

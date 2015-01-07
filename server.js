@@ -135,8 +135,6 @@ wsServer.on('request', function(request) {
             DataRetriever.createStreamFor(connection, experimentID);
         }, function(){
             console.log("Error checking experiment's affiliation");
-            res.write("Error checking experiment's affiliation");
-            res.end();
         });
 	}, function(err) {
 		console.log("Authentication failed! \n" + err);

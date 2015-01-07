@@ -19,8 +19,9 @@ module.exports.retrieveDBAddress = function(callback) {
         console.log("LB multicasted address: ", message.toString());
         if (LBaddress===undefined) {
             LBaddress = message.toString();
-            var addressDB = "mongodb://172.16.67.30:27017/scalarm_db";
+            var addressDB = "mongodb://localhost:27017/scalarm_db";
             console.log("Retrieved database address: ", addressDB);
+	     client.close();
             callback(addressDB);
         }
     })

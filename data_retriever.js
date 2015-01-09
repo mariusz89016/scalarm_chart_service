@@ -1,5 +1,6 @@
 //var DBURL = require("./config.js").db_url;
 var COLLECTION_NAME = "experiment_instances_";
+var CAPPED_COLLECTION_NAME = "experiment_progress_notifications";
 var mongo = require('mongodb');
 var client = mongo.MongoClient;
 var crypto = require('crypto');
@@ -152,20 +153,21 @@ var connect = function(address, success, error){
 			
 		};
 
-		var createStreamFor = function(connection, experimentID){
-			var stream = db.collection("capped_collection").find({date: {"$gte": new Date()/1000}, experiment_id: experimentID},
+		var createStreamFor = function(connection, experimentID, callback){
+			var stream = db.collection(CAPPED_COLLECTION_NAME).find({date: {"$gte": new Date()/1000}, experiment_id: experimentID},
 																 {tailable: true, awaitdata: true, numberOfRetries: -1}).stream();
 
 			stream.on('data', function(item) {
 				console.log(item);
-				connection.send(JSON.stringify(item));
+				connection.send(JSON.stringify(item.bar_info));
 			});
 			stream.on('error', function(error) {
 				console.log("Error retrieving data from capped collection: " + error);
 			})
 			stream.on('close', function() {
-				console.log("Unexpected stream close (capped collection)");
+				console.log("Stream closed (capped collection)");
 			})
+			callback(stream);
 		};
 
 		var getPareto = function(id, outputParam, success, error){

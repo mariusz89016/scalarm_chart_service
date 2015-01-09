@@ -31,6 +31,7 @@ module.exports.retrieveDBAddress = function(callback) {
                 var addressDB = "mongodb://" + JSON.parse(data)[0] + "/scalarm_db";
                 // var addressDB = "mongodb://172.16.67.30:27017/scalarm_db";
                 console.log("Retrieved database address: ", addressDB);
+		        client.close();
                 callback(addressDB);
               })
             });

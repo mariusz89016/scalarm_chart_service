@@ -28,9 +28,11 @@ log4js.configure({
 });
 var logger = log4js.getLogger("server.js");
 
-var PORT = config.server_port,
-	EXTERNAL_IP = config.server_ip,
-	ADDRESS = EXTERNAL_IP + config.server_prefix;
+// var PORT = config.server_port,
+	// EXTERNAL_IP = config.server_ip,// + ":3001",			//TODO - retrieve external IP
+	// ADDRESS = EXTERNAL_IP + config.server_prefix;		//address suffix set in /etc/nginx/conf.d/default.conf
+var PORT = config.server_port;
+var PREFIX = config.server_prefix;
 
 var requests_map = prepare_map_with_requests();
 var app = http.createServer(function(req, res) {
@@ -115,14 +117,20 @@ wsServer.on('request', function(request) {
                 logger.info("Connection closed");
                 //TODO - close cursor?
             });
-            DataRetriever.createStreamFor(connection, experimentID);
+
+            DataRetriever.createStreamFor(connection, experimentID, function(stream){
+            	connection.on('close', function(connection){
+            		console.log("Connection closed");
+            		stream.destroy();
+            	});
+            });
         }, function(){
-            logger.error("User " + userID + " doesn't have access to experiment " + experimentID);
-            res.write("User " + userID + " doesn't have access to experiment " + experimentID);
-            res.end();
+            console.log("Error checking experiment's affiliation");
+            request.reject();
         });
 	}, function(err) {
-		logger.error("Authentication failed! \n" + err);
+		console.log("Authentication failed! \n" + err);
+		request.reject();
 	});
 });
 
@@ -163,10 +171,11 @@ function authenticate(headers, success, error){
     }
 }
 
-function prepare_script_tag(typeOfChart) {
-	var tag = jsdom.createElement("script");
-	tag.setAttribute("type", "text/javascript");
-	tag.setAttribute("src","//"+[ADDRESS, "main", typeOfChart].join("/"));
+function prepare_script_and_style_tags(typeOfChart) {
+	var tags = {};
+	tags.script_tag_main = jsdom.createElement("script");
+	tags.script_tag_main.setAttribute("type", "text/javascript");
+	tags.script_tag_main.setAttribute("src", PREFIX +"/main"+ typeOfChart);
 
     return tag;
 }
@@ -177,8 +186,8 @@ function prepare_map_with_requests() {
 			panel_locals.parameters = data.parameters;
 			panel_locals.output = data.result;
             panel_locals.parameters_and_output = data.parameters.concat(data.result);
-			panel_locals.address = ADDRESS;
-			panel_locals.prefix = config.server_prefix;
+			// panel_locals.address = ADDRESS;
+			panel_locals.prefix = PREFIX;
 			res.writeHead(200);
 			var panel = jade.renderFile("panel.jade", panel_locals);
 			res.write(panel);

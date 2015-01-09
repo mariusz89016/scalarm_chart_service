@@ -1,4 +1,5 @@
 var jsdom = require("jsdom").jsdom();
+//maybe try to normalize variable/file name?
 var db_retriever = require("./data_retriever.js");
 
 var config = require("./config.js");
@@ -13,7 +14,7 @@ var logger = log4js.getLogger("service.js");
 
 module.exports = function() {
     var map = {};
-    map["/interaction"] = function(parameters, success, error){
+    map["interaction"] = function(parameters, success, error){
         if(parameters["id"] && parameters["chart_id"] && parameters["param1"] && parameters["param2"] && parameters["output"]){
             db_retriever.getInteraction(parameters["id"], 
                                         parameters["param1"], 
@@ -27,7 +28,7 @@ module.exports = function() {
         else
             error("Request parameters missing");
     }
-    map["/pareto"] = function(parameters, success, error){
+    map["pareto"] = function(parameters, success, error){
         if(parameters["id"] && parameters["chart_id"]){
             db_retriever.getPareto(parameters["id"], parameters["output"], function(data) {
                 var object = {};
@@ -38,7 +39,7 @@ module.exports = function() {
         else
             error("Request parameters missing");
     }
-	map["/3d"] = function(parameters, success, error){
+	map["3d"] = function(parameters, success, error){
 		if(parameters["id"] && parameters["chart_id"] && parameters["param1"] && parameters["param2"] && parameters["param3"]) {
             db_retriever.get3d(parameters["id"], parameters["param1"], parameters["param2"], parameters["param3"], function (data) {
                 var object = {};

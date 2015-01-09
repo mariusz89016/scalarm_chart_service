@@ -6,10 +6,6 @@ var https = require("https");
 var LBaddress;
 
 module.exports.retrieveDBAddress = function(callback) {
-    //wysluchac na multicascie adres
-    //odczytac z tego adresu adres DB
-    //wywolac callback(adresDB)
-
     client.bind(config.multicast_port);
     client.on("listening", function() {
         client.addMembership(config.multicast_address);
@@ -19,15 +15,31 @@ module.exports.retrieveDBAddress = function(callback) {
         console.log("LB multicasted address: ", message.toString());
         if (LBaddress===undefined) {
             LBaddress = message.toString();
-            var addressDB = "mongodb://172.16.67.30:27017/scalarm_db";
-            console.log("Retrieved database address: ", addressDB);
-            callback(addressDB);
+            var options = {
+              host: LBaddress,
+              path: '/information/db_routers',
+              rejectUnauthorized: false
+            };
+
+            https.get(options, function(res) {
+              var data = "";
+              console.log("Got response: " + res.output);
+              res.on("data", function(chunk) {
+                data+=chunk;
+              });
+              res.on("end", function() {
+                var addressDB = "mongodb://" + JSON.parse(data)[0] + "/scalarm_db";
+                // var addressDB = "mongodb://172.16.67.30:27017/scalarm_db";
+                console.log("Retrieved database address: ", addressDB);
+                callback(addressDB);
+              })
+            });
         }
     })
 
 };
 
-module.exports.registerChartService = function(){
+module.exports.registerChartService = function(callback){
 //    var data = querystring.stringify({
 //        name: "ChartService",
 //        address: config.server_ip + ":" + config.server_port
@@ -40,7 +52,6 @@ module.exports.registerChartService = function(){
         path: "/register?"+data,
         method: "POST",
         rejectUnauthorized: false
-//        agent: false
     };
 
     var post_req = https.request(options, function(response){
@@ -48,6 +59,7 @@ module.exports.registerChartService = function(){
             console.log(chunk.toString());
         })
     });
-//    post_req.write(data);
+
     post_req.end();
+    callback();
 };

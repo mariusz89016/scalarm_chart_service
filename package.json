@@ -11,6 +11,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "cookie": "^0.1.2",
     "cookieDecoder": "git+https://bitbucket.org/mariusz89016/cookie-decoder.git",
     "haml": "^0.4.3",
     "jade": "^1.5.0",

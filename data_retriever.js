@@ -153,7 +153,7 @@ var connect = function(address, success, error){
 			
 		};
 
-		var createStreamFor = function(connection, experimentID){
+		var createStreamFor = function(connection, experimentID, callback){
 			var stream = db.collection(CAPPED_COLLECTION_NAME).find({date: {"$gte": new Date()/1000}, experiment_id: experimentID},
 																 {tailable: true, awaitdata: true, numberOfRetries: -1}).stream();
 
@@ -165,8 +165,9 @@ var connect = function(address, success, error){
 				console.log("Error retrieving data from capped collection: " + error);
 			})
 			stream.on('close', function() {
-				console.log("Unexpected stream close (capped collection)");
+				console.log("Stream closed (capped collection)");
 			})
+			callback(stream);
 		};
 
 		var getPareto = function(id, outputParam, success, error){

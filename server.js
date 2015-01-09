@@ -26,9 +26,11 @@ log4js.configure({
 });
 var logger = log4js.getLogger("server.js");
 
-var PORT = config.server_port,
-	EXTERNAL_IP = config.server_ip,// + ":3001",			//TODO - retrieve external IP
-	ADDRESS = EXTERNAL_IP + config.server_prefix;		//address suffix set in /etc/nginx/conf.d/default.conf
+// var PORT = config.server_port,
+	// EXTERNAL_IP = config.server_ip,// + ":3001",			//TODO - retrieve external IP
+	// ADDRESS = EXTERNAL_IP + config.server_prefix;		//address suffix set in /etc/nginx/conf.d/default.conf
+var PORT = config.server_port;
+var PREFIX = config.server_prefix;
 
 var app = http.createServer(function(req, res) {
 	var parsedUrl = url.parse(req.url);
@@ -132,12 +134,19 @@ wsServer.on('request', function(request) {
                 //TODO - close cursor?
             });
 
-            DataRetriever.createStreamFor(connection, experimentID);
+            DataRetriever.createStreamFor(connection, experimentID, function(stream){
+            	connection.on('close', function(connection){
+            		console.log("Connection closed");
+            		stream.destroy();
+            	});
+            });
         }, function(){
             console.log("Error checking experiment's affiliation");
+            request.reject();
         });
 	}, function(err) {
 		console.log("Authentication failed! \n" + err);
+		request.reject();
 	});
 });
 
@@ -189,7 +198,7 @@ function prepare_script_and_style_tags(typeOfChart) {
 	var tags = {};
 	tags.script_tag_main = jsdom.createElement("script");
 	tags.script_tag_main.setAttribute("type", "text/javascript");
-	tags.script_tag_main.setAttribute("src","//" + ADDRESS +"/main"+ typeOfChart);
+	tags.script_tag_main.setAttribute("src", PREFIX +"/main"+ typeOfChart);
 
 	for(var prop in tags) {
 		tags[prop] = tags[prop].outerHTML;
@@ -205,8 +214,8 @@ function prepare_map_with_requests(parameters) {
 			panel_locals.parameters = data.parameters;
 			panel_locals.output = data.result;
             panel_locals.parameters_and_output = data.parameters.concat(data.result);
-			panel_locals.address = ADDRESS;
-			panel_locals.prefix = config.server_prefix;
+			// panel_locals.address = ADDRESS;
+			panel_locals.prefix = PREFIX;
 			res.writeHead(200);
 			var panel = jade.renderFile("panel.jade", panel_locals);
 			res.write(panel);

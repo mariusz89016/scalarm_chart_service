@@ -42,7 +42,11 @@ var app = http.createServer(function(req, res) {
 	logger.info(pathname + " : " +JSON.stringify(parameters));
 
 	var path = pathname.split("/")[1];
-	if(requests_map[path]) {
+	if(path==="status") {
+                res.write("status ok");
+                res.end();
+        }
+	else if(requests_map[path]) {
         authenticate(req.headers, function (userID) {
             requests_map[path](req, res, pathname, parameters["id"]);
         }, function (err) {
@@ -171,11 +175,10 @@ function authenticate(headers, success, error){
     }
 }
 
-function prepare_script_and_style_tags(typeOfChart) {
-	var tags = {};
-	tags.script_tag_main = jsdom.createElement("script");
-	tags.script_tag_main.setAttribute("type", "text/javascript");
-	tags.script_tag_main.setAttribute("src", PREFIX +"/main"+ typeOfChart);
+function prepare_script_tag(typeOfChart) {
+	var tag = jsdom.createElement("script");
+	tag.setAttribute("type", "text/javascript");
+	tag.setAttribute("src",[PREFIX, "main", typeOfChart].join("/"));
 
     return tag;
 }
@@ -244,11 +247,6 @@ function prepare_map_with_requests() {
 		res.write(tag.outerHTML);
 		res.end();
 	};
-
-	map["status"] = function(req, res, pathname) {
-		res.write("status ok");
-		res.end();
-	}
 
 	return map;
 }

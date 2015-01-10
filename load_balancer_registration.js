@@ -28,8 +28,15 @@ module.exports.retrieveDBAddress = function(callback) {
                 data+=chunk;
               });
               res.on("end", function() {
-                var addressDB = "mongodb://" + JSON.parse(data)[0] + "/scalarm_db";
-                // var addressDB = "mongodb://172.16.67.30:27017/scalarm_db";
+		var addresses = JSON.parse(data);
+		var addressDB;
+		if(addresses.length>0) {
+			var chosenAddress = addresses[Math.floor(Math.random()*addresses.length)];
+	                addressDB = "mongodb://" + chosenAddress + "/scalarm_db";
+		}
+		else {
+			addressDB = "mongodb://localhost:27017/scalarm_db";
+		}
                 console.log("Retrieved database address: ", addressDB);
 		        client.close();
                 callback(addressDB);
